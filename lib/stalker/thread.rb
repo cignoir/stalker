@@ -2,6 +2,13 @@ require 'open-uri'
 
 module Stalker
   class Thread
+    class << self
+      def find(search_word)
+        doc = Nokogiri::HTML.parse(open(Stalker::Config::REFIND_2CH_BASE + search_word).read)
+        doc.css('.thread_url').map{ |node| node.attributes['href'].text }
+      end
+    end
+
     attr_accessor :url, :proxy_url, :title, :uuid
 
     def initialize(url)
