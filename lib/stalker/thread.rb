@@ -5,8 +5,14 @@ module Stalker
     class << self
       def find(search_word, escape = true)
         search_word = URI.escape(search_word) if escape
-        doc = Nokogiri::HTML.parse(open(Stalker::Config::REFIND_2CH_BASE + search_word).read)
-        doc.css('.thread_url').map{ |node| node.attributes['href'].text }
+        url_base = Stalker::Config::PROXY_BASE + Stalker::Config::FINDER_BASE
+        doc = Nokogiri::HTML.parse(open(url_base + search_word).read)
+        doc.css('li').map do |node|
+          a = node.css('a').first
+          href = a.attributes['href'].text
+          url = URI.extract(URI.unescape(href)).first
+          url ? url.gsub(/\/&b=0/, '') : nil
+        end
       end
     end
 
